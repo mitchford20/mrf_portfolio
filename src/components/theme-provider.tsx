@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 type Theme = "dark" | "light";
 
@@ -12,22 +12,23 @@ const ThemeContext = createContext<{
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark"); // Always default to dark for SSR
-  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>("dark");
+  const hydrated = useRef(false);
 
   useEffect(() => {
-    const stored = (localStorage.getItem("theme") as Theme) || "dark";
-    setTheme(stored);
-    setMounted(true);
+    setTheme(document.documentElement.classList.contains("light") ? "light" : "dark");
   }, []);
 
   useEffect(() => {
+    if (!hydrated.current) {
+      hydrated.current = true;
+      return;
+    }
+
     document.documentElement.classList.remove("dark", "light");
     document.documentElement.classList.add(theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
-
-  if (!mounted) return null; // Avoid hydration mismatch
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
@@ -38,4 +39,4 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export function useTheme() {
   return useContext(ThemeContext);
-} 
+}

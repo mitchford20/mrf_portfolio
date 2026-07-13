@@ -1,60 +1,61 @@
 "use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
-  { href: "/", label: "home" },
-  { href: "/projects", label: "projects" },
-  { href: "/contact", label: "contact" },
+  { href: "/", label: "Home" },
+  { href: "/projects", label: "Work" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
+
   return (
-    <nav className="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
-      <div className="w-full max-w-3xl mx-auto px-6 flex flex-row items-center h-16">
-        {/* Links and Theme Toggle */}
-        <div className="flex-1 grid grid-cols-4 items-center">
-          {/* Home */}
-          <div className="flex justify-start">
-            <Link
-              href={navLinks[0].href}
-              className={`font-header text-lg capitalize px-3 py-1 rounded transition-all duration-500
-                ${pathname === navLinks[0].href ? "text-primary font-bold" : "text-muted-foreground hover:text-primary hover:bg-muted/60"}
-                focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60`}
-            >
-              {navLinks[0].label}
-            </Link>
-          </div>
-          {/* Projects */}
-          <div className="flex justify-center">
-            <Link
-              href={navLinks[1].href}
-              className={`font-header text-lg capitalize px-3 py-1 rounded transition-all duration-500
-                ${pathname.startsWith(navLinks[1].href) && navLinks[1].href !== "/" ? "text-primary font-bold" : "text-muted-foreground hover:text-primary hover:bg-muted/60"}
-                focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60`}
-            >
-              {navLinks[1].label}
-            </Link>
-          </div>
-          {/* Contact */}
-          <div className="flex justify-center">
-            <Link
-              href={navLinks[2].href}
-              className={`font-header text-lg capitalize px-3 py-1 rounded transition-all duration-500
-                ${pathname.startsWith(navLinks[2].href) && navLinks[2].href !== "/" ? "text-primary font-bold" : "text-muted-foreground hover:text-primary hover:bg-muted/60"}
-                focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60`}
-            >
-              {navLinks[2].label}
-            </Link>
-          </div>
-          {/* Theme Toggle */}
-          <div className="flex justify-end">
+    <header className="fixed inset-x-0 top-0 z-40 px-3 pt-3 sm:px-6">
+      <nav className="surface mx-auto flex h-14 w-full max-w-6xl items-center justify-between rounded-2xl px-2 sm:px-3">
+        <Link
+          href="/"
+          className="group flex items-center gap-3 rounded-xl pr-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label="Mitchell Ford home"
+        >
+          <span className="grid size-10 place-items-center rounded-xl bg-primary font-mono text-xs font-bold tracking-[-0.08em] text-primary-foreground transition-transform duration-300 group-hover:rotate-3">
+            MF
+          </span>
+          <span className="hidden text-sm font-semibold tracking-[-0.02em] sm:block">
+            Mitchell Ford
+          </span>
+        </Link>
+
+        <div className="flex items-center gap-1">
+          {navLinks.map((link) => {
+            const active =
+              link.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={`rounded-xl px-3 py-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-4 sm:text-sm ${
+                  active
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+          <div className="ml-1 border-l border-border pl-2">
             <ThemeToggle />
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
-} 
+}

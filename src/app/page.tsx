@@ -1,57 +1,90 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Mail, Linkedin, FileText } from "lucide-react";
+import { ArrowDownRight, FileText, Linkedin, Mail } from "lucide-react";
 import { WorkEducationToggle } from "@/components/work-education-toggle";
 import { FeaturedProjects } from "@/components/featured-projects";
 import { PERSONAL_LINKS } from "@/lib/personal-info";
+import { assetPath } from "@/lib/utils";
 
 export default function Home() {
   return (
-    <main className="min-h-screen w-full flex flex-col items-center">
-      <div className="w-full max-w-3xl mx-auto px-6 flex flex-col gap-0">
-        {/* Side-by-side intro */}
-        <section className="flex flex-col md:flex-row w-full py-8 md:py-16 gap-6 md:gap-8 items-center justify-between">
-          {/* Left: Intro */}
-          <div className="flex-1 flex flex-col gap-4 md:gap-6">
-            <h1 className="text-4xl md:text-5xl font-header font-bold text-primary mb-2">Hi, I&apos;m Mitchell Ford</h1>
-            <h2 className="text-xl md:text-2xl font-header mb-4" style={{ color: 'var(--subheader)' }}>Software Engineer & CS Student</h2>
-            <p className="text-base md:text-lg font-body text-muted-foreground max-w-xl">
-              I&apos;m a Computer Science student at Georgia Tech passionate about building impactful software and connecting people through technology. Welcome to my portfolio!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-4">
-              <a href={PERSONAL_LINKS.resume} download target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" className="flex items-center gap-2 shadow transition-all duration-500 hover:shadow-lg">
-                  <FileText className="w-5 h-5" /> Resume
-                </Button>
-              </a>
-              <a href={PERSONAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" className="flex items-center gap-2 shadow transition-all duration-500 hover:shadow-lg">
-                  <Linkedin className="w-5 h-5" /> LinkedIn
-                </Button>
-              </a>
-              <a href={`mailto:${PERSONAL_LINKS.email}`}>
-                <Button variant="outline" className="flex items-center gap-2 shadow transition-all duration-500 hover:shadow-lg">
-                  <Mail className="w-5 h-5" /> Email
-                </Button>
-              </a>
+    <main className="mx-auto w-full max-w-6xl px-5 sm:px-8">
+      <section className="grid min-h-[calc(100svh-5rem)] items-center gap-14 py-16 lg:grid-cols-[1.25fr_0.75fr] lg:gap-20 lg:py-24">
+        <div>
+          <div className="eyebrow reveal mb-7">Software engineer · Georgia Tech</div>
+          <h1 className="display-title reveal reveal-delay-1 max-w-4xl">
+            Hi, I&apos;m Mitchell. I build <span className="signal-text">software</span> that moves ideas forward.
+          </h1>
+          <p className="reveal reveal-delay-2 mt-8 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+            I&apos;m a Computer Science student at Georgia Tech passionate about building impactful software and connecting people through technology.
+          </p>
+
+          <div className="reveal reveal-delay-2 mt-9 flex flex-wrap items-center gap-3">
+            <a
+              href={PERSONAL_LINKS.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-accent-foreground transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <FileText className="size-4" /> View résumé
+            </a>
+            <a
+              href={PERSONAL_LINKS.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn profile"
+              className="surface grid size-12 place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Linkedin className="size-4" />
+            </a>
+            <a
+              href={`mailto:${PERSONAL_LINKS.email}`}
+              aria-label="Email Mitchell"
+              className="surface grid size-12 place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Mail className="size-4" />
+            </a>
+          </div>
+        </div>
+
+        <div className="reveal reveal-delay-2 mx-auto w-full max-w-sm lg:ml-auto">
+          <div className="surface relative rotate-[1.5deg] rounded-[2rem] p-3 transition-transform duration-500 hover:rotate-0">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.4rem] bg-muted">
+              <Image
+                src={assetPath("/profile_pic.png")}
+                alt="Mitchell Ford portrait"
+                fill
+                priority
+                sizes="(max-width: 1024px) 384px, 32vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/45 to-transparent" />
+              <span className="absolute bottom-5 left-5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/80">
+                Atlanta, Georgia
+              </span>
+            </div>
+            <div className="absolute -bottom-5 -left-5 flex items-center gap-3 rounded-2xl border border-border bg-background/90 px-4 py-3 shadow-2xl backdrop-blur-xl">
+              <span className="relative flex size-3">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-50" />
+                <span className="relative inline-flex size-3 rounded-full bg-accent" />
+              </span>
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em]">Always building</span>
             </div>
           </div>
-          {/* Right: Placeholder image */}
-          <div className="flex-1 flex items-center justify-center mt-6 md:mt-0">
-            <div className="rounded-2xl overflow-hidden shadow-lg w-32 h-40 md:w-56 md:h-72 bg-muted flex items-center justify-center">
-              <Image src="/profile_pic.png" alt="Mitchell Ford portrait" width={224} height={288} className="object-cover w-full h-full" />
-            </div>
-          </div>
-        </section>
-        {/* Work/Education toggle section */}
-        <section className="w-full mt-4">
-          <WorkEducationToggle />
-        </section>
-        {/* Featured projects section */}
-        <section className="w-full">
-          <FeaturedProjects />
-        </section>
-      </div>
+        </div>
+
+        <a
+          href="#experience"
+          className="hidden items-center gap-2 self-end font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground lg:flex"
+        >
+          Scroll to explore <ArrowDownRight className="size-4" />
+        </a>
+      </section>
+
+      <section id="experience" className="scroll-mt-28 py-20 lg:py-28">
+        <WorkEducationToggle />
+      </section>
+
+      <FeaturedProjects />
     </main>
   );
 }
