@@ -373,6 +373,68 @@ export function ArcadePortfolio() {
       bevelThickness: 0.055,
     });
     shellGeometry.translate(0, 0, -0.76);
+
+    const dormantShell = new THREE.MeshStandardMaterial({
+      color: 0x11131a,
+      emissive: 0x12151c,
+      emissiveIntensity: 0.48,
+      roughness: 0.72,
+      metalness: 0.24,
+    });
+    const dormantMetal = new THREE.MeshStandardMaterial({
+      color: 0x171a22,
+      emissive: 0x262a36,
+      emissiveIntensity: 0.62,
+      roughness: 0.58,
+      metalness: 0.42,
+    });
+    const dormantGlass = new THREE.MeshStandardMaterial({
+      color: 0x010202,
+      emissive: 0x020504,
+      emissiveIntensity: 0.55,
+      roughness: 0.22,
+      metalness: 0.08,
+    });
+    const neighborMarqueeGeometry = new RoundedBoxGeometry(3.02, 0.88, 1.62, 3, 0.13);
+    const neighborScreenFrameGeometry = new RoundedBoxGeometry(2.58, 1.86, 0.16, 3, 0.12);
+    const neighborScreenGeometry = new RoundedBoxGeometry(2.16, 1.39, 0.035, 3, 0.08);
+    const neighborDeckGeometry = new RoundedBoxGeometry(3.08, 0.24, 1.64, 3, 0.1);
+    const neighborLipGeometry = new RoundedBoxGeometry(3.02, 0.3, 0.16, 3, 0.055);
+    const neighborCoinDoorGeometry = new RoundedBoxGeometry(1.08, 1.48, 0.08, 3, 0.08);
+
+    [
+      [-6.3, -0.7, 0.035],
+      [-3.15, -0.32, 0.018],
+      [3.15, -0.32, -0.018],
+      [6.3, -0.7, -0.035],
+    ].forEach(([x, z, rotationY]) => {
+      const neighbor = new THREE.Group();
+      neighbor.position.set(x, 0, z);
+      neighbor.rotation.y = rotationY;
+
+      const parts = [
+        new THREE.Mesh(shellGeometry, dormantShell),
+        new THREE.Mesh(neighborMarqueeGeometry, dormantShell),
+        new THREE.Mesh(neighborScreenFrameGeometry, dormantMetal),
+        new THREE.Mesh(neighborScreenGeometry, dormantGlass),
+        new THREE.Mesh(neighborDeckGeometry, dormantShell),
+        new THREE.Mesh(neighborLipGeometry, dormantMetal),
+        new THREE.Mesh(neighborCoinDoorGeometry, dormantMetal),
+      ];
+      parts[1].position.set(0, 6.05, 0.02);
+      parts[2].position.set(0, 4.735, 0.84);
+      parts[3].position.set(0, 4.735, 0.99);
+      parts[4].position.set(0, 3.57, 0.74);
+      parts[4].rotation.x = -0.065;
+      parts[5].position.set(0, 3.42, 1.49);
+      parts[6].position.set(0, 1.9, 0.82);
+      parts.forEach((part) => {
+        part.receiveShadow = true;
+        neighbor.add(part);
+      });
+      scene.add(neighbor);
+    });
+
     const shellMesh = new THREE.Mesh(shellGeometry, shell);
     shellMesh.castShadow = true;
     shellMesh.receiveShadow = true;
@@ -486,10 +548,8 @@ export function ArcadePortfolio() {
     marqueeTexture.colorSpace = THREE.SRGBColorSpace;
     marqueeTexture.minFilter = THREE.NearestFilter;
     marqueeTexture.magFilter = THREE.NearestFilter;
-    const marquee = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.45, 0.5),
-      new THREE.MeshBasicMaterial({ map: marqueeTexture }),
-    );
+    const marqueeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, map: marqueeTexture });
+    const marquee = new THREE.Mesh(new THREE.PlaneGeometry(2.45, 0.5), marqueeMaterial);
     marquee.position.set(0, 6.05, 0.992);
     cabinet.add(marquee);
 
@@ -502,18 +562,41 @@ export function ArcadePortfolio() {
     floor.receiveShadow = true;
     scene.add(floor);
 
-    const platform = new THREE.Mesh(
-      new THREE.CylinderGeometry(2.05, 2.18, 0.09, 64),
-      new THREE.MeshStandardMaterial({ color: 0x0a0c12, roughness: 0.42, metalness: 0.55 }),
+    const backWall = new THREE.Mesh(
+      new THREE.PlaneGeometry(28, 10),
+      new THREE.MeshStandardMaterial({ color: 0x020308, roughness: 0.92, metalness: 0.03 }),
     );
-    platform.position.y = 0.035;
-    platform.receiveShadow = true;
-    scene.add(platform);
+    backWall.position.set(0, 4.3, -1.7);
+    backWall.receiveShadow = true;
+    scene.add(backWall);
 
-    scene.add(new THREE.HemisphereLight(0x9aa9c9, 0x070509, 0.58));
-    scene.add(new THREE.AmbientLight(0x6f7890, 0.2));
+    const ceiling = new THREE.Mesh(
+      new THREE.PlaneGeometry(28, 18),
+      new THREE.MeshStandardMaterial({ color: 0x020307, roughness: 0.94, metalness: 0.02 }),
+    );
+    ceiling.rotation.x = Math.PI / 2;
+    ceiling.position.set(0, 8.15, 2.5);
+    ceiling.receiveShadow = true;
+    scene.add(ceiling);
 
-    const keyLight = new THREE.DirectionalLight(0xfff2df, 2.35);
+    const fixtureMaterial = new THREE.MeshStandardMaterial({
+      color: 0x3b3b38,
+      emissive: 0xffedcf,
+      emissiveIntensity: 0.12,
+      roughness: 0.34,
+    });
+    [-6.3, -3.15, 3.15, 6.3].forEach((x) => {
+      addBox(scene, [2.6, 0.18, 0.84], [x, 7.7, 0.05], dormantMetal, 0.08);
+    });
+    addBox(scene, [2.6, 0.18, 0.84], [0, 7.7, 0.35], dormantMetal, 0.08);
+    addBox(scene, [2.2, 0.045, 0.58], [0, 7.59, 0.35], fixtureMaterial, 0.04);
+
+    const hemisphereLight = new THREE.HemisphereLight(0x9aa9c9, 0x070509, 0.12);
+    scene.add(hemisphereLight);
+    const ambientLight = new THREE.AmbientLight(0x6f7890, 0.025);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0xfff2df, 0.25);
     keyLight.position.set(-3.6, 8.5, 6.8);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(1024, 1024);
@@ -523,16 +606,16 @@ export function ArcadePortfolio() {
     keyLight.shadow.camera.bottom = -1;
     scene.add(keyLight);
 
-    const frontFill = new THREE.DirectionalLight(0xc9d6ff, 1.25);
+    const frontFill = new THREE.DirectionalLight(0xc9d6ff, 0.06);
     frontFill.position.set(0, 4.8, 6);
     scene.add(frontFill);
 
-    const blueRim = new THREE.SpotLight(0x3b67d6, 12, 14, Math.PI / 4, 0.72, 1.6);
+    const blueRim = new THREE.SpotLight(0x3b67d6, 0, 14, Math.PI / 4, 0.72, 1.6);
     blueRim.position.set(4.5, 6.2, -1.8);
     blueRim.target.position.set(0, 4.2, 0);
     scene.add(blueRim, blueRim.target);
 
-    const redRim = new THREE.SpotLight(0xbf2430, 7, 12, Math.PI / 5, 0.8, 1.7);
+    const redRim = new THREE.SpotLight(0xbf2430, 0, 12, Math.PI / 5, 0.8, 1.7);
     redRim.position.set(-4.2, 3.4, -1.4);
     redRim.target.position.set(0, 3.4, 0);
     scene.add(redRim, redRim.target);
@@ -540,6 +623,11 @@ export function ArcadePortfolio() {
     const screenGlow = new THREE.PointLight(0x9cff73, 0, 3.8, 2);
     screenGlow.position.set(0, 4.72, 1.65);
     scene.add(screenGlow);
+
+    const overheadLight = new THREE.SpotLight(0xffedcf, 2.2, 15, Math.PI / 4.6, 0.68, 1.55);
+    overheadLight.position.set(0, 7.5, 0.4);
+    overheadLight.target.position.set(0, 3.25, 0.2);
+    scene.add(overheadLight, overheadLight.target);
 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -552,13 +640,13 @@ export function ArcadePortfolio() {
     let currentProgress = 0;
     let disposed = false;
     const desktopCamera = {
-      start: new THREE.Vector3(5.8, 5.45, 16.8),
-      control: new THREE.Vector3(2.35, 6.15, 10.8),
+      start: new THREE.Vector3(3.8, 5.45, 18.2),
+      control: new THREE.Vector3(1.9, 6.15, 11.8),
       end: new THREE.Vector3(0, 4.74, 5.05),
     };
     const compactCamera = {
-      start: new THREE.Vector3(3.8, 5.55, 16.2),
-      control: new THREE.Vector3(1.55, 5.9, 11.1),
+      start: new THREE.Vector3(2.4, 5.55, 16.8),
+      control: new THREE.Vector3(1.2, 5.9, 11.4),
       end: new THREE.Vector3(0, 4.75, 7.35),
     };
     const targetPath = {
@@ -616,7 +704,18 @@ export function ArcadePortfolio() {
       curveB.copy(targetPath.control).lerp(targetPath.end, eased);
       lookTarget.lerpVectors(curveA, curveB, eased);
       camera.lookAt(lookTarget);
-      screenGlow.intensity = THREE.MathUtils.smoothstep(progress, 0.68, 0.96) * 2.8;
+      const roomPower = THREE.MathUtils.smoothstep(progress, 0.68, 0.96);
+      screenGlow.intensity = roomPower * 4.4;
+      screenMaterial.emissiveIntensity = 0.04 + roomPower * 0.3;
+      marqueeMaterial.color.setScalar(0.18 + roomPower * 0.82);
+      fixtureMaterial.emissiveIntensity = 0.12 + roomPower * 1.15;
+      overheadLight.intensity = 2.2 + roomPower * 3.55;
+      hemisphereLight.intensity = 0.12 + roomPower * 0.1;
+      ambientLight.intensity = 0.025 + roomPower * 0.025;
+      keyLight.intensity = 0.25 + roomPower * 0.77;
+      frontFill.intensity = 0.06 + roomPower * 0.3;
+      blueRim.intensity = roomPower * 1.6;
+      redRim.intensity = roomPower * 0.8;
       positionScreen();
       renderer.render(scene, camera);
     };

@@ -264,8 +264,8 @@ body:has(.arcade-page) > #main-content {
   overflow: hidden;
   color: #f8fafc;
   background:
-    radial-gradient(ellipse at 50% 62%, rgba(25, 31, 52, 0.88), transparent 45rem),
-    linear-gradient(180deg, #080a12 0%, #04050a 58%, #020306 100%);
+    radial-gradient(ellipse at 50% 60%, rgba(15, 19, 31, 0.34), transparent 38rem),
+    linear-gradient(180deg, #030407 0%, #020307 58%, #010205 100%);
   isolation: isolate;
 }
 
@@ -374,7 +374,7 @@ body:has(.arcade-page) > #main-content {
   position: absolute;
   inset: 50% -20% -30%;
   z-index: 0;
-  opacity: 0.11;
+  opacity: 0.035;
   background-image:
     linear-gradient(rgba(89, 108, 150, 0.28) 1px, transparent 1px),
     linear-gradient(90deg, rgba(89, 108, 150, 0.28) 1px, transparent 1px);
