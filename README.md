@@ -1,19 +1,14 @@
-# Portfolio Box Grid
+# MRF Arcade Portfolio
 
-A modern, interactive portfolio template built with Next.js, TailwindCSS, shadcn/ui, and dnd-kit.
-
-## Features
-- **Draggable, animated grid** of info boxes (profile, skills, experience, projects, testimonials, etc.)
-- **Dark/light mode toggle** (sun/moon switch, top right, persists your choice)
-- **Varying box sizes** (small, medium, large)
-- **Fully responsive to drag-and-drop** (desktop only)
-- **Easy to customize**: add, remove, or resize boxes with a simple config
+An interactive software-engineering portfolio presented as a powered-on retro arcade cabinet. The experience includes keyboard and pointer navigation, a Three.js arcade-room intro, and the playable Byte Flight canvas game.
 
 ## Tech Stack
-- [Next.js](https://nextjs.org/) (App Router, TypeScript)
-- [TailwindCSS](https://tailwindcss.com/) (custom dark/light palette)
-- [shadcn/ui](https://ui.shadcn.com/) (UI components)
-- [dnd-kit](https://dndkit.com/) (drag-and-drop)
+
+- Next.js and React
+- TypeScript
+- Three.js and WebGL
+- Canvas 2D game physics
+- CSS pixel art
 
 ## Getting Started
 1. **Install dependencies:**
@@ -26,12 +21,11 @@ A modern, interactive portfolio template built with Next.js, TailwindCSS, shadcn
    ```
 3. **Open [http://localhost:3000](http://localhost:3000)**
 
-## Customizing Boxes
-- Edit `src/components/draggable-grid.tsx`:
-  - To **add a box**: add an object to the `initialBoxes` array (unique `id`, `size`, `title`, `content`).
-  - To **change size**: set the `size` property to `'small'`, `'medium'`, or `'large'`.
-  - To **change content**: edit the `title` and `content` fields.
-- See code comments for more details.
+## Test the Game Physics
+
+```bash
+npm run test:game
+```
 
 ## License
 MIT
