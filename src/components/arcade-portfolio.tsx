@@ -766,11 +766,20 @@ export function ArcadePortfolio() {
         <div className="arcade-crt-glass">
           {!ready ? (
             <div className="arcade-boot" role="status" aria-live="polite">
-              <p>MRF BIOS // REV 20.26</p>
-              <p>CHECKING MEMORY............. OK</p>
-              <p>LOADING PLAYER PROFILE..... OK</p>
+              <div className="arcade-boot-topline">
+                <span>MRF WORLD</span>
+                <span>STAGE 01</span>
+              </div>
+              <div className="arcade-boot-card">
+                <p>PORTFOLIO QUEST</p>
+                <strong>MITCHELL FORD</strong>
+                <span>LOADING WORLD 01</span>
+              </div>
               <div className="arcade-boot-bar"><span /></div>
-              <strong>PRESS START</strong>
+              <div className="arcade-boot-status">
+                <span>INITIALIZING PLAYER...</span>
+                <b>PRESS ENTER TO SKIP</b>
+              </div>
             </div>
           ) : (
             <ArcadeScreen

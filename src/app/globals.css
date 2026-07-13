@@ -416,6 +416,11 @@ body:has(.arcade-page) > #main-content {
 }
 
 .arcade-crt {
+  --pixel-blue: #5c94fc;
+  --pixel-navy: #172057;
+  --pixel-red: #a93413;
+  --pixel-yellow: #f8d54a;
+  --pixel-green: #55a938;
   position: fixed;
   z-index: 4;
   visibility: hidden;
@@ -500,16 +505,26 @@ body:has(.arcade-page) > #main-content {
 }
 
 .arcade-boot {
+  position: relative;
   display: flex;
   height: 100%;
   flex-direction: column;
-  justify-content: center;
-  padding: 8cqw;
+  overflow: hidden;
+  padding: 4cqw 5cqw 3cqw;
   opacity: 0;
+  color: #fff8df;
+  background: linear-gradient(
+    to bottom,
+    var(--pixel-blue) 0 74%,
+    var(--pixel-green) 74% 80%,
+    var(--pixel-red) 80% 100%
+  );
   font-family: var(--font-terminal), monospace;
   font-size: clamp(0.6rem, 3.6cqw, 1.2rem);
   line-height: 1.05;
   letter-spacing: 0.03em;
+  text-shadow: 0.16em 0.16em 0 var(--pixel-navy);
+  isolation: isolate;
   animation: arcade-boot-copy 380ms 2.62s forwards steps(3, end);
 }
 
@@ -517,16 +532,55 @@ body:has(.arcade-page) > #main-content {
   to { opacity: 1; }
 }
 
-.arcade-boot p {
-  margin: 0 0 0.28em;
+.arcade-boot > * {
+  position: relative;
+  z-index: 1;
 }
 
-.arcade-boot strong {
-  margin-top: 0.6em;
-  font-family: var(--font-pixel), monospace;
-  font-size: 0.55em;
+.arcade-boot-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: max(1px, 0.45cqw) solid #fff8df;
+  padding: 0.8cqh 1.2cqw 1.4cqh;
+  background: rgba(23, 32, 87, 0.72);
+  font-size: clamp(0.48rem, 2.6cqw, 0.9rem);
+  letter-spacing: 0.08em;
+}
+
+.arcade-boot-card {
+  width: min(78%, 34rem);
+  margin: auto auto 2cqh;
+  border: max(1px, 0.55cqw) solid #fff8df;
+  padding: 2.2cqh 2cqw;
+  background: var(--pixel-navy);
+  box-shadow:
+    inset 0 0 0 max(1px, 0.5cqw) #2e3c8f,
+    0 max(2px, 0.8cqh) 0 rgba(23, 32, 87, 0.75);
+  text-align: center;
+}
+
+.arcade-boot-card p {
+  margin: 0 0 1.2cqh;
+  color: var(--pixel-yellow);
+  font-size: 0.72em;
   letter-spacing: 0.12em;
-  animation: arcade-blink 620ms steps(2, end) infinite;
+}
+
+.arcade-boot-card strong {
+  display: block;
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(0.58rem, 4.1cqw, 1.35rem);
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+.arcade-boot-card > span {
+  display: block;
+  margin-top: 1.4cqh;
+  color: var(--pixel-yellow);
+  font-size: 0.68em;
+  letter-spacing: 0.1em;
 }
 
 @keyframes arcade-blink {
@@ -534,19 +588,46 @@ body:has(.arcade-page) > #main-content {
 }
 
 .arcade-boot-bar {
-  width: 100%;
-  height: clamp(0.25rem, 2cqh, 0.65rem);
-  margin-top: 0.45em;
-  border: 1px solid currentColor;
-  padding: 1px;
+  width: min(78%, 34rem);
+  height: clamp(0.42rem, 3.2cqh, 0.9rem);
+  margin: 0 auto;
+  border: max(1px, 0.45cqw) solid #fff8df;
+  padding: max(1px, 0.25cqw);
+  background: var(--pixel-navy);
+  box-shadow: 0 max(1px, 0.45cqh) 0 rgba(23, 32, 87, 0.7);
 }
 
 .arcade-boot-bar span {
   display: block;
   width: 0;
   height: 100%;
-  background: currentColor;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--pixel-yellow) 0 10%,
+      #d79224 10% 12.5%
+    );
   animation: arcade-load 720ms 2.74s forwards steps(8, end);
+}
+
+.arcade-boot-status {
+  display: flex;
+  width: min(78%, 34rem);
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  margin: 1.5cqh auto 0;
+  padding: 0.65cqh 1cqw;
+  color: #fff8df;
+  background: rgba(23, 32, 87, 0.82);
+  font-size: 0.62em;
+  letter-spacing: 0.07em;
+}
+
+.arcade-boot-status b {
+  color: var(--pixel-yellow);
+  font-weight: inherit;
+  animation: arcade-blink 620ms steps(2, end) infinite;
 }
 
 @keyframes arcade-load {
@@ -563,11 +644,6 @@ body:has(.arcade-page) > #main-content {
 }
 
 .arcade-menu-screen {
-  --pixel-blue: #5c94fc;
-  --pixel-navy: #172057;
-  --pixel-red: #a93413;
-  --pixel-yellow: #f8d54a;
-  --pixel-green: #55a938;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -584,6 +660,8 @@ body:has(.arcade-page) > #main-content {
   animation: arcade-menu-in 320ms both steps(4, end);
 }
 
+.arcade-boot::before,
+.arcade-boot::after,
 .arcade-menu-screen::before,
 .arcade-menu-screen::after {
   position: absolute;
@@ -592,6 +670,7 @@ body:has(.arcade-page) > #main-content {
   pointer-events: none;
 }
 
+.arcade-boot::before,
 .arcade-menu-screen::before {
   inset: 0;
   background:
@@ -602,6 +681,7 @@ body:has(.arcade-page) > #main-content {
   opacity: 0.9;
 }
 
+.arcade-boot::after,
 .arcade-menu-screen::after {
   right: 0;
   bottom: 0;
@@ -1082,6 +1162,47 @@ body:has(.arcade-page) > #main-content {
 }
 
 @media (max-height: 620px) {
+  .arcade-boot {
+    padding: 3cqw 4cqw 2cqw;
+    font-size: clamp(0.42rem, 3cqw, 0.85rem);
+  }
+
+  .arcade-boot-topline {
+    padding-block: 0.4cqh 0.7cqh;
+    font-size: clamp(0.36rem, 2.4cqw, 0.7rem);
+  }
+
+  .arcade-boot-card {
+    width: 82%;
+    margin-bottom: 1cqh;
+    padding-block: 1cqh;
+  }
+
+  .arcade-boot-card p,
+  .arcade-boot-card > span,
+  .arcade-boot-status span {
+    display: none;
+  }
+
+  .arcade-boot-card strong {
+    font-size: clamp(0.44rem, 3.7cqw, 1rem);
+  }
+
+  .arcade-boot-bar,
+  .arcade-boot-status {
+    width: 82%;
+  }
+
+  .arcade-boot-bar {
+    height: clamp(0.375rem, 2.4cqh, 0.65rem);
+  }
+
+  .arcade-boot-status {
+    justify-content: center;
+    margin-top: 0.8cqh;
+    padding-block: 0.3cqh;
+  }
+
   .arcade-menu-heading {
     margin-block: 1.5cqh;
   }
