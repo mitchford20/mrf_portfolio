@@ -252,8 +252,8 @@ body:has(.arcade-page) > #main-content {
 
 .arcade-page {
   --arcade-void: #050713;
-  --arcade-red: #dc2626;
-  --arcade-blue: #2563eb;
+  --arcade-red: #bf2430;
+  --arcade-blue: #3567d6;
   --arcade-green: #9cff73;
   --arcade-screen: #061109;
   --arcade-ink: #071009;
@@ -264,9 +264,8 @@ body:has(.arcade-page) > #main-content {
   overflow: hidden;
   color: #f8fafc;
   background:
-    radial-gradient(circle at 21% 52%, rgba(220, 38, 38, 0.14), transparent 25rem),
-    radial-gradient(circle at 78% 34%, rgba(37, 99, 235, 0.19), transparent 28rem),
-    linear-gradient(180deg, #090b18, var(--arcade-void));
+    radial-gradient(ellipse at 50% 62%, rgba(25, 31, 52, 0.88), transparent 45rem),
+    linear-gradient(180deg, #080a12 0%, #04050a 58%, #020306 100%);
   isolation: isolate;
 }
 
@@ -276,7 +275,7 @@ body:has(.arcade-page) > #main-content {
   z-index: 5;
   content: "";
   pointer-events: none;
-  box-shadow: inset 0 0 13vw 5vw rgba(0, 0, 0, 0.82);
+  box-shadow: inset 0 0 11vw 4vw rgba(0, 0, 0, 0.72);
 }
 
 .arcade-static-fallback {
@@ -375,10 +374,10 @@ body:has(.arcade-page) > #main-content {
   position: absolute;
   inset: 50% -20% -30%;
   z-index: 0;
-  opacity: 0.24;
+  opacity: 0.11;
   background-image:
-    linear-gradient(rgba(37, 99, 235, 0.38) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37, 99, 235, 0.38) 1px, transparent 1px);
+    linear-gradient(rgba(89, 108, 150, 0.28) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(89, 108, 150, 0.28) 1px, transparent 1px);
   background-size: 5.5rem 3.6rem;
   transform: perspective(32rem) rotateX(62deg);
   transform-origin: center top;
@@ -399,6 +398,7 @@ body:has(.arcade-page) > #main-content {
   font-size: 0.56rem;
   letter-spacing: 0.08em;
   backdrop-filter: blur(10px);
+  cursor: pointer;
   transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
 }
 
@@ -423,15 +423,16 @@ body:has(.arcade-page) > #main-content {
   border-radius: 3.5% / 5%;
   color: var(--arcade-green);
   background: #010302;
-  box-shadow:
-    inset 0 0 1.5rem rgba(0, 0, 0, 0.94),
-    0 0 1.5rem rgba(56, 255, 101, 0.12);
+  box-shadow: inset 0 0 1.5rem rgba(0, 0, 0, 0.94);
   container-type: size;
   pointer-events: none;
 }
 
 .arcade-crt.is-ready {
   pointer-events: auto;
+  box-shadow:
+    inset 0 0 1.5rem rgba(0, 0, 0, 0.94),
+    0 0 1.7rem rgba(82, 255, 122, 0.1);
 }
 
 .arcade-crt::before,
@@ -472,7 +473,7 @@ body:has(.arcade-page) > #main-content {
 }
 
 .arcade-crt.is-booting .arcade-crt-glass {
-  animation: arcade-crt-power 1.05s 2.05s both cubic-bezier(0.22, 1, 0.36, 1);
+  animation: arcade-crt-power 1.05s 4.25s both cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes arcade-crt-power {
@@ -508,7 +509,7 @@ body:has(.arcade-page) > #main-content {
   font-size: clamp(0.6rem, 3.6cqw, 1.2rem);
   line-height: 1.05;
   letter-spacing: 0.03em;
-  animation: arcade-boot-copy 380ms 2.52s forwards steps(3, end);
+  animation: arcade-boot-copy 380ms 4.73s forwards steps(3, end);
 }
 
 @keyframes arcade-boot-copy {
@@ -544,7 +545,7 @@ body:has(.arcade-page) > #main-content {
   width: 0;
   height: 100%;
   background: currentColor;
-  animation: arcade-load 720ms 2.63s forwards steps(8, end);
+  animation: arcade-load 720ms 4.85s forwards steps(8, end);
 }
 
 @keyframes arcade-load {
@@ -633,6 +634,7 @@ body:has(.arcade-page) > #main-content {
   letter-spacing: 0.03em;
   text-align: left;
   text-transform: uppercase;
+  cursor: pointer;
   transition: background 90ms steps(2, end), color 90ms steps(2, end);
 }
 
@@ -680,6 +682,7 @@ body:has(.arcade-page) > #main-content {
   padding: 0 0.3em;
   color: inherit;
   background: transparent;
+  cursor: pointer;
   font: inherit;
   letter-spacing: 0.06em;
 }

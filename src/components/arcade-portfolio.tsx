@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { projects } from "@/data/projects";
 import { PERSONAL_LINKS } from "@/lib/personal-info";
 import { workData } from "@/components/work-education-toggle";
@@ -21,16 +22,24 @@ const SCREEN_BOUNDS = {
   right: 1.08,
   top: 5.43,
   bottom: 4.04,
-  z: 0.87,
+  z: 1,
 };
+
+const INTRO_DURATION = 6200;
+const MENU_REVEAL_DELAY = 6400;
 
 function addBox(
   parent: THREE.Object3D,
   size: [number, number, number],
   position: [number, number, number],
   material: THREE.Material,
+  radius = 0.06,
 ) {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
+  const safeRadius = Math.min(radius, Math.min(...size) * 0.42);
+  const mesh = new THREE.Mesh(
+    new RoundedBoxGeometry(...size, safeRadius > 0.01 ? 3 : 1, safeRadius),
+    material,
+  );
   mesh.position.set(...position);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
@@ -230,7 +239,7 @@ export function ArcadePortfolio() {
 
   useEffect(() => {
     if (ready) return;
-    const timer = window.setTimeout(() => setReady(true), 3700);
+    const timer = window.setTimeout(() => setReady(true), MENU_REVEAL_DELAY);
     return () => window.clearTimeout(timer);
   }, [ready]);
 
@@ -305,57 +314,138 @@ export function ArcadePortfolio() {
     }
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x050713, 10, 28);
+    scene.fog = new THREE.Fog(0x04050a, 15, 36);
 
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
     const cabinet = new THREE.Group();
     scene.add(cabinet);
 
-    const black = new THREE.MeshStandardMaterial({ color: 0x0b0c12, roughness: 0.52, metalness: 0.18 });
-    const charcoal = new THREE.MeshStandardMaterial({ color: 0x191a24, roughness: 0.38, metalness: 0.28 });
-    const red = new THREE.MeshStandardMaterial({ color: 0xdc2626, emissive: 0x590808, emissiveIntensity: 0.85, roughness: 0.32 });
-    const blue = new THREE.MeshStandardMaterial({ color: 0x2563eb, emissive: 0x071b66, emissiveIntensity: 0.9, roughness: 0.3 });
-    const green = new THREE.MeshStandardMaterial({ color: 0x142419, emissive: 0x07190b, emissiveIntensity: 0.45, roughness: 0.42 });
-    const chrome = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.18, metalness: 0.82 });
+    const shell = new THREE.MeshPhysicalMaterial({
+      color: 0x11131a,
+      roughness: 0.3,
+      metalness: 0.34,
+      clearcoat: 0.58,
+      clearcoatRoughness: 0.24,
+    });
+    const black = new THREE.MeshStandardMaterial({ color: 0x05060a, roughness: 0.66, metalness: 0.16 });
+    const charcoal = new THREE.MeshStandardMaterial({ color: 0x1c202a, roughness: 0.4, metalness: 0.42 });
+    const gunmetal = new THREE.MeshStandardMaterial({ color: 0x272b35, roughness: 0.34, metalness: 0.68 });
+    const red = new THREE.MeshStandardMaterial({ color: 0xbf2430, emissive: 0x330308, emissiveIntensity: 0.42, roughness: 0.3, metalness: 0.2 });
+    const blue = new THREE.MeshStandardMaterial({ color: 0x3567d6, emissive: 0x061846, emissiveIntensity: 0.5, roughness: 0.3, metalness: 0.16 });
+    const yellow = new THREE.MeshStandardMaterial({ color: 0xe9b949, emissive: 0x3d2404, emissiveIntensity: 0.3, roughness: 0.28 });
+    const screenMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x07100a,
+      emissive: 0x061309,
+      emissiveIntensity: 0.18,
+      roughness: 0.2,
+      clearcoat: 0.92,
+      clearcoatRoughness: 0.12,
+    });
+    const chrome = new THREE.MeshPhysicalMaterial({ color: 0xd8dee9, roughness: 0.16, metalness: 0.92, clearcoat: 0.4 });
 
-    addBox(cabinet, [2.58, 3.35, 1.48], [0, 1.73, 0], black);
-    addBox(cabinet, [2.86, 2.94, 1.68], [0, 4.79, 0], charcoal);
-    addBox(cabinet, [2.98, 0.22, 1.55], [0, 6.26, 0.02], red);
-    addBox(cabinet, [2.76, 0.27, 1.38], [0, 3.52, 0.52], charcoal);
-    addBox(cabinet, [2.78, 0.74, 0.15], [0, 5.89, 0.88], black);
-    addBox(cabinet, [2.42, 1.7, 0.12], [0, 4.75, 0.86], black);
-    addBox(cabinet, [2.16, 1.39, 0.04], [0, 4.735, 0.93], green);
-    addBox(cabinet, [0.07, 2.54, 0.08], [-1.39, 4.7, 0.89], blue);
-    addBox(cabinet, [0.07, 2.54, 0.08], [1.39, 4.7, 0.89], blue);
-    addBox(cabinet, [2.46, 0.12, 0.1], [0, 3.43, 1.22], red);
+    const shellShape = new THREE.Shape();
+    shellShape.moveTo(-1.12, 0.15);
+    shellShape.lineTo(-1.18, 3.18);
+    shellShape.lineTo(-1.4, 3.42);
+    shellShape.lineTo(-1.46, 3.7);
+    shellShape.lineTo(-1.29, 3.9);
+    shellShape.lineTo(-1.31, 5.68);
+    shellShape.lineTo(-1.46, 5.9);
+    shellShape.lineTo(-1.4, 6.34);
+    shellShape.quadraticCurveTo(-1.34, 6.5, -1.16, 6.56);
+    shellShape.lineTo(1.16, 6.56);
+    shellShape.quadraticCurveTo(1.34, 6.5, 1.4, 6.34);
+    shellShape.lineTo(1.46, 5.9);
+    shellShape.lineTo(1.31, 5.68);
+    shellShape.lineTo(1.29, 3.9);
+    shellShape.lineTo(1.46, 3.7);
+    shellShape.lineTo(1.4, 3.42);
+    shellShape.lineTo(1.18, 3.18);
+    shellShape.lineTo(1.12, 0.15);
+    shellShape.closePath();
 
-    const deck = addBox(cabinet, [2.78, 0.23, 1.35], [0, 3.58, 0.75], charcoal);
-    deck.rotation.x = -0.055;
+    const shellGeometry = new THREE.ExtrudeGeometry(shellShape, {
+      depth: 1.52,
+      steps: 1,
+      bevelEnabled: true,
+      bevelSegments: 3,
+      bevelSize: 0.055,
+      bevelThickness: 0.055,
+    });
+    shellGeometry.translate(0, 0, -0.76);
+    const shellMesh = new THREE.Mesh(shellGeometry, shell);
+    shellMesh.castShadow = true;
+    shellMesh.receiveShadow = true;
+    cabinet.add(shellMesh);
 
-    const joystickStem = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.24, 18), chrome);
-    joystickStem.position.set(-0.56, 3.76, 0.82);
+    addBox(cabinet, [2.2, 2.72, 0.08], [0, 1.74, 0.79], black, 0.1);
+    addBox(cabinet, [3.02, 0.88, 1.62], [0, 6.05, 0.02], shell, 0.13);
+    addBox(cabinet, [2.8, 0.73, 0.18], [0, 6.05, 0.84], red, 0.1);
+    addBox(cabinet, [2.59, 0.56, 0.1], [0, 6.05, 0.93], black, 0.07);
+
+    addBox(cabinet, [2.58, 1.86, 0.16], [0, 4.735, 0.84], black, 0.12);
+    addBox(cabinet, [2.38, 1.66, 0.1], [0, 4.735, 0.92], charcoal, 0.1);
+    addBox(cabinet, [2.16, 1.39, 0.035], [0, 4.735, 0.99], screenMaterial, 0.08);
+
+    [-1, 1].forEach((side) => {
+      const trimCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(side * 1.28, 3.88, 0.84),
+        new THREE.Vector3(side * 1.32, 4.58, 0.84),
+        new THREE.Vector3(side * 1.32, 5.42, 0.84),
+        new THREE.Vector3(side * 1.38, 6.2, 0.84),
+      ]);
+      const trim = new THREE.Mesh(new THREE.TubeGeometry(trimCurve, 28, 0.028, 8, false), blue);
+      trim.castShadow = true;
+      cabinet.add(trim);
+    });
+
+    const ventGeometry = new THREE.CylinderGeometry(0.028, 0.028, 0.035, 12);
+    for (let index = -4; index <= 4; index += 1) {
+      const vent = new THREE.Mesh(ventGeometry, gunmetal);
+      vent.rotation.x = Math.PI / 2;
+      vent.position.set(index * 0.11, 5.6, 0.975);
+      cabinet.add(vent);
+    }
+
+    const deck = addBox(cabinet, [3.08, 0.24, 1.64], [0, 3.57, 0.74], shell, 0.1);
+    deck.rotation.x = -0.065;
+    const controlSurface = addBox(cabinet, [2.73, 0.075, 1.28], [0, 3.715, 0.76], gunmetal, 0.07);
+    controlSurface.rotation.x = -0.065;
+    addBox(cabinet, [3.02, 0.3, 0.16], [0, 3.42, 1.49], red, 0.055);
+
+    const joystickStem = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.06, 0.24, 18), chrome);
+    joystickStem.position.set(-0.58, 3.77, 0.78);
     joystickStem.castShadow = true;
     cabinet.add(joystickStem);
 
-    const joystickTop = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 14), red);
-    joystickTop.position.set(-0.56, 3.92, 0.82);
+    const joystickTop = new THREE.Mesh(new THREE.SphereGeometry(0.14, 22, 16), red);
+    joystickTop.position.set(-0.58, 3.91, 0.78);
     joystickTop.castShadow = true;
     cabinet.add(joystickTop);
 
-    const buttonGeometry = new THREE.CylinderGeometry(0.12, 0.14, 0.075, 24);
-    [[0.34, 0.7, blue], [0.72, 0.82, red], [0.99, 0.61, blue]].forEach(([x, z, material]) => {
+    const buttonGeometry = new THREE.CylinderGeometry(0.105, 0.125, 0.07, 24);
+    [[0.34, 0.71, blue], [0.67, 0.83, yellow], [0.98, 0.66, red]].forEach(([x, z, material]) => {
       const button = new THREE.Mesh(buttonGeometry, material as THREE.Material);
-      button.position.set(x as number, 3.735, z as number);
+      button.position.set(x as number, 3.79, z as number);
       button.castShadow = true;
       cabinet.add(button);
     });
 
-    const footGeometry = new THREE.BoxGeometry(0.44, 0.16, 1.18);
+    const coinDoor = addBox(cabinet, [1.08, 1.48, 0.08], [0, 1.9, 0.82], gunmetal, 0.08);
+    coinDoor.receiveShadow = true;
+    addBox(cabinet, [0.88, 1.27, 0.045], [0, 1.9, 0.87], black, 0.055);
+    [-0.23, 0.23].forEach((x) => {
+      addBox(cabinet, [0.13, 0.3, 0.045], [x, 2.18, 0.905], chrome, 0.025);
+      addBox(cabinet, [0.075, 0.14, 0.025], [x, 2.18, 0.94], red, 0.018);
+    });
+    addBox(cabinet, [0.48, 0.18, 0.045], [0, 1.46, 0.91], gunmetal, 0.035);
+
+    for (let index = 0; index < 4; index += 1) {
+      addBox(cabinet, [0.7, 0.035, 0.035], [0, 0.75 + index * 0.1, 0.86], gunmetal, 0.01);
+    }
+
     [-0.87, 0.87].forEach((x) => {
-      const foot = new THREE.Mesh(footGeometry, black);
-      foot.position.set(x, 0.08, 0);
-      foot.castShadow = true;
-      cabinet.add(foot);
+      addBox(cabinet, [0.46, 0.18, 1.18], [x, 0.11, 0], black, 0.055);
     });
 
     const marqueeCanvas = document.createElement("canvas");
@@ -364,49 +454,92 @@ export function ArcadePortfolio() {
     const context = marqueeCanvas.getContext("2d");
     if (context) {
       context.imageSmoothingEnabled = false;
-      context.fillStyle = "#dc2626";
+      const marqueeGradient = context.createLinearGradient(0, 0, marqueeCanvas.width, marqueeCanvas.height);
+      marqueeGradient.addColorStop(0, "#17040a");
+      marqueeGradient.addColorStop(0.48, "#0a0b14");
+      marqueeGradient.addColorStop(1, "#081638");
+      context.fillStyle = "#bf2430";
       context.fillRect(0, 0, marqueeCanvas.width, marqueeCanvas.height);
-      context.fillStyle = "#050713";
-      context.fillRect(18, 18, marqueeCanvas.width - 36, marqueeCanvas.height - 36);
+      context.fillStyle = marqueeGradient;
+      context.fillRect(16, 16, marqueeCanvas.width - 32, marqueeCanvas.height - 32);
+      context.strokeStyle = "rgba(53, 103, 214, 0.7)";
+      context.lineWidth = 3;
+      for (let x = 40; x < marqueeCanvas.width; x += 72) {
+        context.beginPath();
+        context.moveTo(x, 20);
+        context.lineTo(x - 58, marqueeCanvas.height - 20);
+        context.stroke();
+      }
       context.fillStyle = "#f8fafc";
-      context.font = "700 68px monospace";
+      context.font = "700 62px monospace";
       context.textAlign = "center";
       context.textBaseline = "middle";
-      context.fillText("MRF // 20", marqueeCanvas.width / 2, marqueeCanvas.height / 2 + 2);
+      context.shadowColor = "rgba(255,255,255,0.4)";
+      context.shadowBlur = 14;
+      context.fillText("MRF // ARCADE", marqueeCanvas.width / 2, marqueeCanvas.height / 2 - 4);
+      context.shadowBlur = 0;
+      context.fillStyle = "#9cff73";
+      context.font = "500 18px monospace";
+      context.fillText("PORTFOLIO SYSTEM 20.26", marqueeCanvas.width / 2, marqueeCanvas.height - 29);
     }
     const marqueeTexture = new THREE.CanvasTexture(marqueeCanvas);
     marqueeTexture.colorSpace = THREE.SRGBColorSpace;
     marqueeTexture.minFilter = THREE.NearestFilter;
     marqueeTexture.magFilter = THREE.NearestFilter;
     const marquee = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.45, 0.58),
+      new THREE.PlaneGeometry(2.45, 0.5),
       new THREE.MeshBasicMaterial({ map: marqueeTexture }),
     );
-    marquee.position.set(0, 5.9, 0.967);
+    marquee.position.set(0, 6.05, 0.992);
     cabinet.add(marquee);
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(40, 40),
-      new THREE.MeshStandardMaterial({ color: 0x03040a, roughness: 0.78, metalness: 0.08 }),
+      new THREE.MeshStandardMaterial({ color: 0x030408, roughness: 0.86, metalness: 0.06 }),
     );
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -0.015;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    scene.add(new THREE.HemisphereLight(0x667eea, 0x050507, 1.35));
-    const keyLight = new THREE.DirectionalLight(0xf8fafc, 3.4);
-    keyLight.position.set(3, 9, 7);
+    const platform = new THREE.Mesh(
+      new THREE.CylinderGeometry(2.05, 2.18, 0.09, 64),
+      new THREE.MeshStandardMaterial({ color: 0x0a0c12, roughness: 0.42, metalness: 0.55 }),
+    );
+    platform.position.y = 0.035;
+    platform.receiveShadow = true;
+    scene.add(platform);
+
+    scene.add(new THREE.HemisphereLight(0x9aa9c9, 0x070509, 0.58));
+    scene.add(new THREE.AmbientLight(0x6f7890, 0.2));
+
+    const keyLight = new THREE.DirectionalLight(0xfff2df, 2.35);
+    keyLight.position.set(-3.6, 8.5, 6.8);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(1024, 1024);
+    keyLight.shadow.camera.left = -4;
+    keyLight.shadow.camera.right = 4;
+    keyLight.shadow.camera.top = 8;
+    keyLight.shadow.camera.bottom = -1;
     scene.add(keyLight);
 
-    const redLight = new THREE.PointLight(0xdc2626, 24, 9, 2);
-    redLight.position.set(-4, 3.4, 3);
-    scene.add(redLight);
-    const blueLight = new THREE.PointLight(0x2563eb, 27, 10, 2);
-    blueLight.position.set(4, 5.6, 2.5);
-    scene.add(blueLight);
+    const frontFill = new THREE.DirectionalLight(0xc9d6ff, 1.25);
+    frontFill.position.set(0, 4.8, 6);
+    scene.add(frontFill);
+
+    const blueRim = new THREE.SpotLight(0x3b67d6, 12, 14, Math.PI / 4, 0.72, 1.6);
+    blueRim.position.set(4.5, 6.2, -1.8);
+    blueRim.target.position.set(0, 4.2, 0);
+    scene.add(blueRim, blueRim.target);
+
+    const redRim = new THREE.SpotLight(0xbf2430, 7, 12, Math.PI / 5, 0.8, 1.7);
+    redRim.position.set(-4.2, 3.4, -1.4);
+    redRim.target.position.set(0, 3.4, 0);
+    scene.add(redRim, redRim.target);
+
+    const screenGlow = new THREE.PointLight(0x9cff73, 0, 3.8, 2);
+    screenGlow.position.set(0, 4.72, 1.65);
+    scene.add(screenGlow);
 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -418,6 +551,24 @@ export function ArcadePortfolio() {
     let frameId = 0;
     let currentProgress = 0;
     let disposed = false;
+    const desktopCamera = {
+      start: new THREE.Vector3(5.8, 5.45, 16.8),
+      control: new THREE.Vector3(2.35, 6.15, 10.8),
+      end: new THREE.Vector3(0, 4.74, 5.05),
+    };
+    const compactCamera = {
+      start: new THREE.Vector3(3.8, 5.55, 16.2),
+      control: new THREE.Vector3(1.55, 5.9, 11.1),
+      end: new THREE.Vector3(0, 4.75, 7.35),
+    };
+    const targetPath = {
+      start: new THREE.Vector3(0, 3.05, 0),
+      control: new THREE.Vector3(0, 3.65, 0.12),
+      end: new THREE.Vector3(0, 4.66, 0.42),
+    };
+    const curveA = new THREE.Vector3();
+    const curveB = new THREE.Vector3();
+    const lookTarget = new THREE.Vector3();
 
     const resize = () => {
       const width = window.innerWidth;
@@ -453,18 +604,19 @@ export function ArcadePortfolio() {
 
     const renderAt = (progress: number) => {
       const compact = window.innerWidth / window.innerHeight < 0.75;
-      const start = compact
-        ? new THREE.Vector3(3.25, 5.35, 14.8)
-        : new THREE.Vector3(4.9, 5.6, 13.4);
-      const end = compact
-        ? new THREE.Vector3(0, 4.75, 7.65)
-        : new THREE.Vector3(0, 4.72, 5.72);
-      const startTarget = new THREE.Vector3(0, 3.15, 0);
-      const endTarget = new THREE.Vector3(0, 4.67, 0.35);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const path = compact ? compactCamera : desktopCamera;
+      const approach = THREE.MathUtils.clamp((progress - 0.08) / 0.92, 0, 1);
+      const eased = approach * approach * (3 - 2 * approach);
 
-      camera.position.lerpVectors(start, end, eased);
-      camera.lookAt(startTarget.lerp(endTarget, eased));
+      curveA.copy(path.start).lerp(path.control, eased);
+      curveB.copy(path.control).lerp(path.end, eased);
+      camera.position.lerpVectors(curveA, curveB, eased);
+
+      curveA.copy(targetPath.start).lerp(targetPath.control, eased);
+      curveB.copy(targetPath.control).lerp(targetPath.end, eased);
+      lookTarget.lerpVectors(curveA, curveB, eased);
+      camera.lookAt(lookTarget);
+      screenGlow.intensity = THREE.MathUtils.smoothstep(progress, 0.68, 0.96) * 2.8;
       positionScreen();
       renderer.render(scene, camera);
     };
@@ -473,7 +625,7 @@ export function ArcadePortfolio() {
       if (disposed) return;
       currentProgress = skippedRef.current || reducedMotionRef.current
         ? 1
-        : Math.min((now - clockStart) / 3600, 1);
+        : Math.min((now - clockStart) / INTRO_DURATION, 1);
       renderAt(currentProgress);
       if (currentProgress < 1) frameId = window.requestAnimationFrame(animate);
     };
@@ -493,7 +645,6 @@ export function ArcadePortfolio() {
       window.removeEventListener("resize", handleResize);
       marqueeTexture.dispose();
       buttonGeometry.dispose();
-      footGeometry.dispose();
       scene.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
         object.geometry.dispose();
