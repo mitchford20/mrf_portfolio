@@ -26,7 +26,7 @@ const SCREEN_BOUNDS = {
 };
 
 const INTRO_DURATION = 6200;
-const MENU_REVEAL_DELAY = 6400;
+const MENU_REVEAL_DELAY = 5200;
 
 function addBox(
   parent: THREE.Object3D,
@@ -373,68 +373,6 @@ export function ArcadePortfolio() {
       bevelThickness: 0.055,
     });
     shellGeometry.translate(0, 0, -0.76);
-
-    const dormantShell = new THREE.MeshStandardMaterial({
-      color: 0x11131a,
-      emissive: 0x12151c,
-      emissiveIntensity: 0.48,
-      roughness: 0.72,
-      metalness: 0.24,
-    });
-    const dormantMetal = new THREE.MeshStandardMaterial({
-      color: 0x171a22,
-      emissive: 0x262a36,
-      emissiveIntensity: 0.62,
-      roughness: 0.58,
-      metalness: 0.42,
-    });
-    const dormantGlass = new THREE.MeshStandardMaterial({
-      color: 0x010202,
-      emissive: 0x020504,
-      emissiveIntensity: 0.55,
-      roughness: 0.22,
-      metalness: 0.08,
-    });
-    const neighborMarqueeGeometry = new RoundedBoxGeometry(3.02, 0.88, 1.62, 3, 0.13);
-    const neighborScreenFrameGeometry = new RoundedBoxGeometry(2.58, 1.86, 0.16, 3, 0.12);
-    const neighborScreenGeometry = new RoundedBoxGeometry(2.16, 1.39, 0.035, 3, 0.08);
-    const neighborDeckGeometry = new RoundedBoxGeometry(3.08, 0.24, 1.64, 3, 0.1);
-    const neighborLipGeometry = new RoundedBoxGeometry(3.02, 0.3, 0.16, 3, 0.055);
-    const neighborCoinDoorGeometry = new RoundedBoxGeometry(1.08, 1.48, 0.08, 3, 0.08);
-
-    [
-      [-6.3, -0.7, 0.035],
-      [-3.15, -0.32, 0.018],
-      [3.15, -0.32, -0.018],
-      [6.3, -0.7, -0.035],
-    ].forEach(([x, z, rotationY]) => {
-      const neighbor = new THREE.Group();
-      neighbor.position.set(x, 0, z);
-      neighbor.rotation.y = rotationY;
-
-      const parts = [
-        new THREE.Mesh(shellGeometry, dormantShell),
-        new THREE.Mesh(neighborMarqueeGeometry, dormantShell),
-        new THREE.Mesh(neighborScreenFrameGeometry, dormantMetal),
-        new THREE.Mesh(neighborScreenGeometry, dormantGlass),
-        new THREE.Mesh(neighborDeckGeometry, dormantShell),
-        new THREE.Mesh(neighborLipGeometry, dormantMetal),
-        new THREE.Mesh(neighborCoinDoorGeometry, dormantMetal),
-      ];
-      parts[1].position.set(0, 6.05, 0.02);
-      parts[2].position.set(0, 4.735, 0.84);
-      parts[3].position.set(0, 4.735, 0.99);
-      parts[4].position.set(0, 3.57, 0.74);
-      parts[4].rotation.x = -0.065;
-      parts[5].position.set(0, 3.42, 1.49);
-      parts[6].position.set(0, 1.9, 0.82);
-      parts.forEach((part) => {
-        part.receiveShadow = true;
-        neighbor.add(part);
-      });
-      scene.add(neighbor);
-    });
-
     const shellMesh = new THREE.Mesh(shellGeometry, shell);
     shellMesh.castShadow = true;
     shellMesh.receiveShadow = true;
@@ -553,6 +491,43 @@ export function ArcadePortfolio() {
     marquee.position.set(0, 6.05, 0.992);
     cabinet.add(marquee);
 
+    const poweredMaterials = [shell, black, charcoal, gunmetal, red, blue, yellow, screenMaterial, chrome, marqueeMaterial];
+    const dormantMaterials = new Map<THREE.Material, THREE.Material>();
+    poweredMaterials.forEach((material) => {
+      const dormant = material.clone();
+      if (dormant instanceof THREE.MeshStandardMaterial) {
+        dormant.emissive.set(0x000000);
+        dormant.emissiveIntensity = 0;
+        dormant.roughness = Math.max(dormant.roughness, 0.56);
+      } else if (dormant instanceof THREE.MeshBasicMaterial) {
+        dormant.color.set(0x030406);
+      }
+      if (material === screenMaterial && dormant instanceof THREE.MeshStandardMaterial) {
+        dormant.color.set(0x010202);
+      }
+      dormantMaterials.set(material, dormant);
+    });
+
+    [
+      [-6.3, -0.7, 0.035],
+      [-3.15, -0.32, 0.018],
+      [3.15, -0.32, -0.018],
+      [6.3, -0.7, -0.035],
+    ].forEach(([x, z, rotationY]) => {
+      const neighbor = cabinet.clone(true);
+      neighbor.position.set(x, 0, z);
+      neighbor.rotation.y = rotationY;
+      neighbor.traverse((object) => {
+        if (!(object instanceof THREE.Mesh)) return;
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        object.material = materials.map((material) => dormantMaterials.get(material) ?? material);
+        if (materials.length === 1) object.material = object.material[0];
+        object.castShadow = false;
+        object.receiveShadow = true;
+      });
+      scene.add(neighbor);
+    });
+
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(40, 40),
       new THREE.MeshStandardMaterial({ color: 0x030408, roughness: 0.86, metalness: 0.06 }),
@@ -585,6 +560,7 @@ export function ArcadePortfolio() {
       emissiveIntensity: 0.12,
       roughness: 0.34,
     });
+    const dormantMetal = dormantMaterials.get(gunmetal) ?? gunmetal;
     [-6.3, -3.15, 3.15, 6.3].forEach((x) => {
       addBox(scene, [2.6, 0.18, 0.84], [x, 7.7, 0.05], dormantMetal, 0.08);
     });
@@ -704,7 +680,7 @@ export function ArcadePortfolio() {
       curveB.copy(targetPath.control).lerp(targetPath.end, eased);
       lookTarget.lerpVectors(curveA, curveB, eased);
       camera.lookAt(lookTarget);
-      const roomPower = THREE.MathUtils.smoothstep(progress, 0.68, 0.96);
+      const roomPower = THREE.MathUtils.smoothstep(progress, 0.36, 0.74);
       screenGlow.intensity = roomPower * 4.4;
       screenMaterial.emissiveIntensity = 0.04 + roomPower * 0.3;
       marqueeMaterial.color.setScalar(0.18 + roomPower * 0.82);
