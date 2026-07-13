@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "test:game": "node --experimental-strip-types --test src/components/arcade-game-physics.test.mjs",
     "start": "next start",
     "lint": "next lint",
     "predeploy": "next build",

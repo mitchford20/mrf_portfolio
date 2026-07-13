@@ -7,14 +7,16 @@ import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.j
 import { projects } from "@/data/projects";
 import { PERSONAL_LINKS } from "@/lib/personal-info";
 import { workData } from "@/components/work-education-toggle";
+import { ArcadeGame } from "@/components/arcade-game";
 
-type SectionId = "about" | "experience" | "projects" | "contact";
+type ScreenId = "about" | "experience" | "projects" | "contact" | "play";
 
-const MENU_ITEMS: { id: SectionId; label: string; code: string }[] = [
+const MENU_ITEMS: { id: ScreenId; label: string; code: string }[] = [
   { id: "about", label: "About player", code: "01" },
   { id: "experience", label: "Experience", code: "02" },
   { id: "projects", label: "Project select", code: "03" },
   { id: "contact", label: "Connect", code: "04" },
+  { id: "play", label: "Play", code: "START" },
 ];
 
 const SCREEN_BOUNDS = {
@@ -56,10 +58,10 @@ function ArcadeScreen({
   backButtonRef,
   menuButtonRefs,
 }: {
-  activeSection: SectionId | null;
+  activeSection: ScreenId | null;
   selected: number;
   onBack: () => void;
-  onOpen: (section: SectionId) => void;
+  onOpen: (section: ScreenId) => void;
   onSelect: (index: number) => void;
   backButtonRef: RefObject<HTMLButtonElement | null>;
   menuButtonRefs: RefObject<(HTMLButtonElement | null)[]>;
@@ -76,14 +78,14 @@ function ArcadeScreen({
           <h2>MITCHELL FORD</h2>
           <span>SOFTWARE ENGINEER // ATLANTA</span>
         </div>
-        <nav className="arcade-menu" aria-label="Portfolio sections">
+        <nav className="arcade-menu" aria-label="Portfolio sections and game">
           {MENU_ITEMS.map((item, index) => (
             <button
               key={item.id}
               ref={(node) => { menuButtonRefs.current[index] = node; }}
               type="button"
               tabIndex={selected === index ? 0 : -1}
-              className={selected === index ? "is-selected" : undefined}
+              className={`${selected === index ? "is-selected" : ""} ${item.id === "play" ? "arcade-menu-play" : ""}`.trim() || undefined}
               aria-current={selected === index ? "true" : undefined}
               onMouseEnter={() => onSelect(index)}
               onFocus={() => onSelect(index)}
@@ -102,13 +104,17 @@ function ArcadeScreen({
     );
   }
 
+  if (activeSection === "play") {
+    return <ArcadeGame onExit={onBack} backButtonRef={backButtonRef} />;
+  }
+
   return (
     <div className="arcade-screen-panel">
       <div className="arcade-panel-header">
         <button ref={backButtonRef} type="button" onClick={onBack}>
           ◀ BACK <span>[ESC]</span>
         </button>
-        <span>{MENU_ITEMS.find((item) => item.id === activeSection)?.code}/04</span>
+        <span>{MENU_ITEMS.find((item) => item.id === activeSection)?.code}/05</span>
       </div>
 
       {activeSection === "about" && (
@@ -207,19 +213,19 @@ export function ArcadePortfolio() {
   const reducedMotionRef = useRef(false);
   const menuButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const backButtonRef = useRef<HTMLButtonElement>(null);
-  const previousSectionRef = useRef<SectionId | null>(null);
+  const previousSectionRef = useRef<ScreenId | null>(null);
   const [enhanced, setEnhanced] = useState(false);
   const [ready, setReady] = useState(false);
   const [webglFallback, setWebglFallback] = useState(false);
   const [selected, setSelected] = useState(0);
-  const [activeSection, setActiveSection] = useState<SectionId | null>(null);
+  const [activeSection, setActiveSection] = useState<ScreenId | null>(null);
 
   const finishIntro = useCallback(() => {
     skippedRef.current = true;
     setReady(true);
   }, []);
 
-  const openSection = useCallback((section: SectionId) => {
+  const openSection = useCallback((section: ScreenId) => {
     setActiveSection(section);
   }, []);
 
@@ -246,7 +252,7 @@ export function ArcadePortfolio() {
   useEffect(() => {
     const previousSection = previousSectionRef.current;
 
-    if (activeSection) {
+    if (activeSection && activeSection !== "play") {
       backButtonRef.current?.focus();
     } else if (previousSection) {
       menuButtonRefs.current[selected]?.focus();
@@ -258,7 +264,7 @@ export function ArcadePortfolio() {
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if (activeSection) {
-        if (event.key === "Escape" || event.key === "ArrowLeft") {
+        if (event.key === "Escape" || (activeSection !== "play" && event.key === "ArrowLeft")) {
           event.preventDefault();
           setActiveSection(null);
         }
