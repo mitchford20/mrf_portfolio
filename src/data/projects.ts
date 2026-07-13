@@ -12,6 +12,16 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    title: "MRF Arcade Portfolio",
+    image: assetPath("/arcade-portfolio.svg"),
+    description:
+      "Interactive alternate portfolio staged inside a cinematic Three.js arcade room, with keyboard navigation, responsive pixel-art screens, and the playable Byte Flight canvas game.",
+    tech: ["Next.js", "TypeScript", "Three.js", "WebGL", "Canvas"],
+    website: "https://mitchford20.github.io/mrf_arcade_portfolio/",
+    source: "https://github.com/mitchford20/mrf_arcade_portfolio",
+    featured: true,
+  },
+  {
     title: "AAPL Next-Day Direction Classifier",
     image: assetPath("/AAPL-model.png"),
     description:
