@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { assetPath } from "@/lib/utils";
 
-const workData = [
+export const workData = [
   {
     logo: assetPath("/veritrade.png"),
     date: "October 2025 – Present",
@@ -57,7 +57,7 @@ const workData = [
   },
 ];
 
-const educationData = [
+export const educationData = [
   {
     logo: assetPath("/gtimage.png"),
     date: "Expected Dec 2026",

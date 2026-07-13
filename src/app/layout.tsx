@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Press_Start_2P, VT323 } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
@@ -12,6 +12,20 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const pressStart = Press_Start_2P({
+  variable: "--font-pixel",
+  weight: "400",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const terminal = VT323({
+  variable: "--font-terminal",
+  weight: "400",
+  subsets: ["latin"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -32,11 +46,11 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-body`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${pressStart.variable} ${terminal.variable} antialiased font-body`}>
         <ThemeProvider>
           <a
             href="#main-content"
-            className="fixed left-4 top-4 z-50 -translate-y-24 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ring"
+            className="site-skip fixed left-4 top-4 z-50 -translate-y-24 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ring"
           >
             Skip to content
           </a>
