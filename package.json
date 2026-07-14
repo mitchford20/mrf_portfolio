@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "predeploy": "next build",
-    "deploy": "gh-pages -d out"
+    "deploy": "gh-pages -d out --nojekyll -r https://github.com/mitchford20/mrf_portfolio.git"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
